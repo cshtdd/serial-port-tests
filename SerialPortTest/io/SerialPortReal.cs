@@ -7,10 +7,14 @@ namespace SerialPortTest.io
     public class SerialPortReal : ISerialPort
     {
         private const int MAX_CAPACITY = 10 * 1024;
-        private readonly SerialPort serialPort;
+
+        private bool disposed = false;
 
         private readonly object bufferCriticalSection = new object();
         private readonly StringBuilder receivedDataBuffer = new StringBuilder(MAX_CAPACITY);
+
+        private readonly SerialPort serialPort;
+
 
         public SerialPortReal(string port)
         {
@@ -30,7 +34,24 @@ namespace SerialPortTest.io
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                serialPort.DataReceived -= SerialPort_DataReceived;
+                serialPort.Dispose();
+            }
+
+            disposed = true;
         }
     }
 }
