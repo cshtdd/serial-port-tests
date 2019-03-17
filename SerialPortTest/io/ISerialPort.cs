@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SerialPortTest.io
 {
-    interface ISerialPort
+    public interface ISerialPort : IDisposable
     {
         void Send(byte[] data);
     }
