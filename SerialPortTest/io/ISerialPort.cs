@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SerialPortTest.io
 {
     public interface ISerialPort : IDisposable
     {
+        void Open();
+        void Close();
+        void ConfigureReceiver(Action<String> receiver);
         void Send(string data);
     }
 }
