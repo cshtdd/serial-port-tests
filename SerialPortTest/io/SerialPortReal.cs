@@ -8,28 +8,18 @@ namespace SerialPortTest.io
     {
         private const int MAX_CAPACITY = 10 * 1024;
 
-        private bool disposed = false;
+        private bool _disposed = false;
 
-        private readonly object bufferCriticalSection = new object();
-        private readonly StringBuilder receivedDataBuffer = new StringBuilder(MAX_CAPACITY);
+        private readonly object _bufferCriticalSection = new object();
+        private readonly StringBuilder _receivedDataBuffer = new StringBuilder(MAX_CAPACITY);
 
-        private readonly SerialPort serialPort;
+        private readonly SerialPort _serialPort;
 
 
         public SerialPortReal(string port)
         {
-            serialPort = new SerialPort(port);
-            serialPort.DataReceived += SerialPort_DataReceived;
-        }
-
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            //serialPort.ReadExisting()
-        }
-
-        public void Send(byte[] data)
-        {
-            throw new NotImplementedException();
+            _serialPort = new SerialPort(port);
+            _serialPort.DataReceived += SerialPort_DataReceived;
         }
 
         public void Dispose()
@@ -40,18 +30,37 @@ namespace SerialPortTest.io
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            if (_disposed)
             {
                 return;
             }
 
             if (disposing)
             {
-                serialPort.DataReceived -= SerialPort_DataReceived;
-                serialPort.Dispose();
+                _serialPort.DataReceived -= SerialPort_DataReceived;
+                _serialPort.Dispose();
             }
 
-            disposed = true;
+            _disposed = true;
+        }
+
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            var readData = _serialPort.ReadExisting();
+            AppendToBuffer(readData);
+        }
+
+        public void Send(string data)
+        {
+            _serialPort.Write(data);
+        }
+
+        private void AppendToBuffer(string data)
+        {
+            lock (_bufferCriticalSection)
+            {
+                _receivedDataBuffer.Append(data);
+            }
         }
     }
 }

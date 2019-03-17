@@ -8,6 +8,6 @@ namespace SerialPortTest.io
 {
     public interface ISerialPort : IDisposable
     {
-        void Send(byte[] data);
+        void Send(string data);
     }
 }
